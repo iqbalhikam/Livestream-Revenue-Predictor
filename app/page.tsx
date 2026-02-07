@@ -25,9 +25,6 @@ export default function LandingPage() {
             <Globe className="w-4 h-4" />
             <span>{language === 'id' ? 'ID' : 'EN'}</span>
           </button>
-          <button  className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">
-            {common.signIn}
-          </button>
         </div>
       </nav>
 
