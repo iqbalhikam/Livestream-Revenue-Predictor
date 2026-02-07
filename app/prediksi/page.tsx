@@ -2,7 +2,29 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Sparkles, TrendingUp, Activity, MessageCircle, MousePointer2, Clock, AlertCircle, Lightbulb, AlertTriangle, ChevronDown, ChevronUp, Users, Eye, UserPlus, Share2, Layout, Percent, Globe, Zap, ArrowLeft, ArrowRight } from 'lucide-react';
+import {
+  Sparkles,
+  TrendingUp,
+  Activity,
+  MessageCircle,
+  MousePointer2,
+  Clock,
+  AlertCircle,
+  Lightbulb,
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  Users,
+  Eye,
+  UserPlus,
+  Share2,
+  Layout,
+  Percent,
+  Globe,
+  Zap,
+  ArrowLeft,
+  ArrowRight,
+} from 'lucide-react';
 import { useLanguage } from '@/components/LanguageContext';
 import { dictionaries } from '@/lib/dictionaries';
 
@@ -63,7 +85,9 @@ const DEMO_DATA: PredictionData = {
   CTR: 48,
 };
 
-export default function PredictionPage() {
+import { Suspense } from 'react';
+
+function PredictionContent() {
   // --- State ---
   const { language, toggleLanguage } = useLanguage();
   const dict = dictionaries[language].prediction;
@@ -632,6 +656,19 @@ export default function PredictionPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PredictionPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        </div>
+      }>
+      <PredictionContent />
+    </Suspense>
   );
 }
 
