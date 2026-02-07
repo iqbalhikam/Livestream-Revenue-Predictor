@@ -1,206 +1,89 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Sparkles, TrendingUp, DollarSign, Activity, MessageCircle, MousePointer2, Clock, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight, Sparkles, TrendingUp, BarChart3, ShieldCheck, Globe } from 'lucide-react';
+import { useLanguage } from '@/components/LanguageContext';
+import { dictionaries } from '@/lib/dictionaries';
 
-interface PredictionData {
-  Views: number;
-  'Product clicks': number; // Keeping exact key as requested
-  Likes: number;
-  Comments: number;
-  Duration: number;
-}
-
-interface ApiResponse {
-  prediction: number;
-}
-
-export default function PredictionPage() {
-  const [formData, setFormData] = useState<PredictionData>({
-    Views: 0,
-    'Product clicks': 0,
-    Likes: 0,
-    Comments: 0,
-    Duration: 0,
-  });
-
-  const [prediction, setPrediction] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: parseFloat(value) || 0,
-    }));
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const handlePredict = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setPrediction(null);
-
-    try {
-      // Constructing payload exactly as requested
-      const payload = {
-        data: {
-          Views: formData.Views,
-          'Product clicks': formData['Product clicks'],
-          Likes: formData.Likes,
-          Comments: formData.Comments,
-          Duration: formData.Duration,
-        },
-      };
-
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
-      const response = await fetch(`${apiUrl}/predict`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch prediction. Is the API running?');
-      }
-
-      const result: ApiResponse = await response.json();
-      setPrediction(result.prediction);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
+export default function LandingPage() {
+  const { language, toggleLanguage } = useLanguage();
+  const dict = dictionaries[language].landing;
+  const common = dictionaries[language].common;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-indigo-50 via-purple-50 to-pink-50 p-6 flex items-center justify-center font-sans text-slate-800">
-      <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        {/* Left Col: Header & Context */}
-        <div className="space-y-6 text-center lg:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-600 text-sm font-medium">
-            <Sparkles className="w-4 h-4" />
-            <span>AI Powered Analytics</span>
+    <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-indigo-100 selection:text-indigo-700">
+      {/* Navbar Placeholder */}
+      <nav className="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-10">
+        <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+            <Sparkles className="w-5 h-5" />
           </div>
-          <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-linear-to-r from-indigo-600 to-purple-600">Livestream Revenue Predictor</h1>
-          <p className="text-lg text-slate-600 leading-relaxed">Estimate your potential earnings using advanced machine learning. Simply enter your engagement metrics and get instant insights.</p>
+          <span>StreamLytics</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <button onClick={toggleLanguage} className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors bg-white/50 px-3 py-1.5 rounded-full border border-transparent hover:border-slate-200">
+            <Globe className="w-4 h-4" />
+            <span>{language === 'id' ? 'ID' : 'EN'}</span>
+          </button>
+          <button  className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">
+            {common.signIn}
+          </button>
+        </div>
+      </nav>
 
-          {/* Result Card (Desktop View - Floating) */}
-          <div className="hidden lg:block transform transition-all hover:scale-[1.02] duration-300">
-            <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-xl shadow-indigo-100/50">
-              <div className="flex items-center gap-4 mb-2">
-                <div className="p-3 bg-green-100 rounded-2xl text-green-600">
-                  <DollarSign className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500 font-medium">Predicted Revenue</p>
-                  <div className="h-8 flex items-center">
-                    {loading ? (
-                      <div className="animate-pulse w-32 h-6 bg-slate-200 rounded"></div>
-                    ) : prediction !== null ? (
-                      <span className="text-2xl font-bold text-slate-800">{formatCurrency(prediction)}</span>
-                    ) : (
-                      <span className="text-xs text-slate-400 italic">Waiting for input...</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* Hero Section */}
+      <div className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-linear-to-b from-indigo-50/80 to-transparent -z-10" />
+        <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-purple-100/50 rounded-full blur-3xl -z-10" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-100/50 rounded-full blur-3xl -z-10" />
+
+        <div className="container mx-auto px-6 text-center max-w-4xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-sm font-medium mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+            </span>
+            {dict.newModel}
+          </div>
+
+          <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-[1.1] animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both delay-100">
+            {dict.heroTitle1} <br />
+            <span className="bg-clip-text text-transparent bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-300% animate-gradient">{dict.heroTitle2}</span>
+          </h1>
+
+          <p className="text-lg lg:text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-both delay-200">{dict.heroDesc}</p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-700 fill-mode-both delay-300">
+            <Link href="/prediksi" className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-full shadow-xl shadow-indigo-200/50 transition-all hover:scale-105 flex items-center gap-2 group">
+              {common.started}
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link href="/prediksi?demo=true" className="px-8 py-4 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-full border border-slate-200 transition-colors flex items-center justify-center">
+              {common.demo}
+            </Link>
           </div>
         </div>
+      </div>
 
-        {/* Right Col: Input Form */}
-        <div className="bg-white/70 backdrop-blur-md border border-white/50 rounded-3xl p-8 shadow-2xl shadow-indigo-100/40 relative overflow-hidden">
-          {/* Decorative Blur Orbs */}
-          <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-200/50 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-200/50 rounded-full blur-3xl pointer-events-none"></div>
-
-          <form onSubmit={handlePredict} className="space-y-5 relative">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <InputField label="Total Views" name="Views" value={formData.Views} onChange={handleInputChange} icon={<Activity className="w-4 h-4" />} placeholder="e.g. 15000" />
-              <InputField label="Product Clicks" name="Product clicks" value={formData['Product clicks']} onChange={handleInputChange} icon={<MousePointer2 className="w-4 h-4" />} placeholder="e.g. 120" />
-              <InputField label="Total Likes" name="Likes" value={formData.Likes} onChange={handleInputChange} icon={<TrendingUp className="w-4 h-4" />} placeholder="e.g. 3500" />
-              <InputField label="Comments" name="Comments" value={formData.Comments} onChange={handleInputChange} icon={<MessageCircle className="w-4 h-4" />} placeholder="e.g. 45" />
-            </div>
-
-            <InputField label="Duration (Minutes)" name="Duration" value={formData.Duration} onChange={handleInputChange} icon={<Clock className="w-4 h-4" />} placeholder="e.g. 60" fullWidth />
-
-            {error && (
-              <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl flex items-start gap-3 text-sm animate-fade-in">
-                <AlertCircle className="w-5 h-5 shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-4 rounded-2xl shadow-lg shadow-indigo-200/50 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>Analyzing Data...</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  <span>Hitung Prediksi</span>
-                </>
-              )}
-            </button>
-
-            {/* Mobile Result Card */}
-            <div className="lg:hidden mt-6 bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4 text-center">
-              <p className="text-xs text-indigo-400 font-semibold uppercase tracking-wider mb-1">Estimated Revenue</p>
-              {loading ? <div className="h-8 w-24 bg-slate-200 rounded animate-pulse mx-auto"></div> : <p className="text-2xl font-bold text-slate-800">{prediction !== null ? formatCurrency(prediction) : 'Rp 0'}</p>}
-            </div>
-          </form>
+      {/* Features Grid */}
+      <div className="container mx-auto px-6 py-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <FeatureCard icon={<BarChart3 className="w-6 h-6 text-indigo-600" />} title={dict.features.f1Title} description={dict.features.f1Desc} />
+          <FeatureCard icon={<TrendingUp className="w-6 h-6 text-purple-600" />} title={dict.features.f2Title} description={dict.features.f2Desc} />
+          <FeatureCard icon={<ShieldCheck className="w-6 h-6 text-green-600" />} title={dict.features.f3Title} description={dict.features.f3Desc} />
         </div>
       </div>
     </div>
   );
 }
 
-interface InputFieldProps {
-  label: string;
-  name: string;
-  value: number;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  icon: React.ReactNode;
-  placeholder?: string;
-  fullWidth?: boolean;
-}
-
-function InputField({ label, name, value, onChange, icon, placeholder, fullWidth }: InputFieldProps) {
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className={fullWidth ? 'col-span-1 md:col-span-2' : ''}>
-      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 ml-1">{label}</label>
-      <div className="relative group">
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 peer-focus:text-indigo-500 transition-colors pointer-events-none">{icon}</div>
-        <input
-          type="number"
-          name={name}
-          value={value === 0 ? '' : value}
-          onChange={onChange}
-          placeholder={placeholder}
-          className="peer w-full bg-white/50 border-2 border-slate-100 rounded-xl py-3 pl-11 pr-4 text-slate-800 font-medium placeholder-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-sm hover:border-slate-200"
-        />
-      </div>
+    <div className="p-6 rounded-3xl bg-slate-50 hover:bg-white border border-transparent hover:border-indigo-100 transition-all hover:shadow-xl hover:shadow-indigo-100/20 group">
+      <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4 group-hover:scale-110 transition-transform duration-300">{icon}</div>
+      <h3 className="text-xl font-bold mb-2 text-slate-800">{title}</h3>
+      <p className="text-slate-600 leading-relaxed">{description}</p>
     </div>
   );
 }
