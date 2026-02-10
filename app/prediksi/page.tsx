@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageContext';
 import { dictionaries } from '@/lib/dictionaries';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 // --- Interfaces ---
 
@@ -49,7 +50,12 @@ interface PredictionData {
 }
 
 interface ApiResponse {
+  status: string;
   prediction: number;
+  formatted_revenue: string;
+  cluster_name: string;
+  cluster_desc: string;
+  ai_analysis: string;
 }
 
 // --- Constants & Limits ---
@@ -111,6 +117,10 @@ function PredictionContent() {
 
   const [loading, setLoading] = useState(false);
   const [prediction, setPrediction] = useState<number | null>(null);
+  const [formattedRevenue, setFormattedRevenue] = useState<string | null>(null);
+  const [clusterName, setClusterName] = useState<string | null>(null);
+  const [clusterDesc, setClusterDesc] = useState<string | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isAdvancedMode, setIsAdvancedMode] = useState(false);
 
@@ -270,6 +280,10 @@ function PredictionContent() {
     e.preventDefault();
     setError(null);
     setPrediction(null);
+    setFormattedRevenue(null);
+    setClusterName(null);
+    setClusterDesc(null);
+    setAiAnalysis(null);
 
     if (!validateForm()) {
       return;
@@ -299,6 +313,10 @@ function PredictionContent() {
 
       const data: ApiResponse = await response.json();
       setPrediction(data.prediction);
+      setFormattedRevenue(data.formatted_revenue);
+      setClusterName(data.cluster_name);
+      setClusterDesc(data.cluster_desc);
+      setAiAnalysis(data.ai_analysis);
 
       // Scroll to result on success
       setTimeout(() => {
@@ -322,22 +340,25 @@ function PredictionContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-indigo-100 selection:text-indigo-700">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 selection:bg-indigo-100 dark:selection:bg-indigo-900 selection:text-indigo-700 dark:selection:text-indigo-300 transition-colors duration-300">
       {/* ... Navbar and Header ... */}
-      <nav className="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50">
+      <nav className="fixed top-0 left-0 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-50 transition-colors">
         <div className="container mx-auto px-6 h-16 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-slate-900">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+          <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-slate-900 dark:text-white">
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
               <Sparkles className="w-5 h-5" />
             </div>
             <span>StreamLytics</span>
           </div>
-          <button
-            onClick={toggleLanguage}
-            className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors bg-slate-100 px-3 py-1.5 rounded-full border border-transparent hover:border-slate-200">
-            <Globe className="w-4 h-4" />
-            <span>{language === 'id' ? 'ID' : 'EN'}</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+              <Globe className="w-4 h-4" />
+              <span>{language === 'id' ? 'ID' : 'EN'}</span>
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -346,38 +367,40 @@ function PredictionContent() {
           {/* Left Column: Header & Intro */}
           <div className="lg:col-span-5 space-y-8">
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 text-sm font-medium mb-6">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
                 </span>
                 {dict.aiPowered}
               </div>
-              <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-6 leading-tight text-slate-900">
+              <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-6 leading-tight text-slate-900 dark:text-white">
                 {dict.title1} <br />
                 <span className="bg-clip-text text-transparent bg-linear-to-r from-indigo-600 to-purple-600">{dict.title2}</span>
               </h1>
-              <p className="text-lg text-slate-600 leading-relaxed mb-8">{dict.description}</p>
+              <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-8">{dict.description}</p>
             </div>
 
             {/* Prediction Result Card */}
             {prediction !== null && (
               <div className="animate-in fade-in zoom-in-50 duration-500">
-                <div className="bg-linear-to-br from-indigo-600 to-purple-700 rounded-3xl p-8 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden">
+                <div className="bg-linear-to-br from-indigo-600 to-purple-700 rounded-3xl p-8 text-white shadow-2xl shadow-indigo-200 dark:shadow-indigo-900/40 relative overflow-hidden">
                   <div className="absolute top-0 right-0 p-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                  <div className="relative z-10">
-                    <p className="text-indigo-100 font-medium mb-2 uppercase tracking-wide text-xs">{dict.estimatedRevenue}</p>
-                    <div className="text-4xl lg:text-5xl font-bold mb-6 tracking-tight flex items-baseline gap-2">
-                      {formatCurrency(prediction)}
-                      <span className="text-lg font-normal text-indigo-200">IDR</span>
+                  <div className="relative z-10 box-border">
+                    <div className="flex justify-between items-start mb-4">
+                      <p className="text-indigo-100 font-medium uppercase tracking-wide text-xs">{dict.estimatedRevenue}</p>
+                      {clusterName && <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-white/20 shadow-sm">{clusterName}</span>}
                     </div>
+
+                    <div className="text-4xl lg:text-5xl font-bold mb-2 tracking-tight flex items-baseline gap-2">{formattedRevenue || formatCurrency(prediction)}</div>
+                    <p className="text-indigo-200 text-sm mb-6">{clusterDesc}</p>
 
                     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                       <div className="flex items-start gap-3">
                         <Lightbulb className="w-5 h-5 text-amber-300 shrink-0 mt-0.5" />
                         <div>
                           <p className="font-semibold text-white text-sm mb-1">{dict.optimizationTip}</p>
-                          <p className="text-indigo-100 text-xs leading-relaxed opacity-90">{dict.tipDesc}</p>
+                          <p className="text-indigo-100 text-xs leading-relaxed opacity-90">{aiAnalysis || dict.tipDesc}</p>
                         </div>
                       </div>
                     </div>
@@ -389,10 +412,10 @@ function PredictionContent() {
 
           {/* Right Column: Form */}
           <div className="lg:col-span-7">
-            <div className="bg-white/70 backdrop-blur-md border border-white/50 rounded-3xl p-6 md:p-8 shadow-2xl shadow-indigo-100/40 relative overflow-hidden">
+            <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/50 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl shadow-indigo-100/40 dark:shadow-indigo-900/20 relative overflow-hidden transition-colors">
               {/* Decorative Orbs */}
-              <div className="absolute -top-20 -right-20 w-60 h-60 bg-purple-200/30 rounded-full blur-3xl pointer-events-none"></div>
-              <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-indigo-200/30 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="absolute -top-20 -right-20 w-60 h-60 bg-purple-200/30 dark:bg-purple-900/20 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-indigo-200/30 dark:bg-indigo-900/20 rounded-full blur-3xl pointer-events-none"></div>
 
               {/* Demo Banner */}
               {isDemoMode && (
@@ -405,7 +428,7 @@ function PredictionContent() {
               <form ref={formRef} onSubmit={handlePredict} className={`space-y-6 relative ${isDemoMode ? 'mt-8' : ''}`}>
                 {/* Basic Metrics Section */}
                 <div>
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Activity className="w-4 h-4" /> {dict.basicMetrics}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -483,8 +506,11 @@ function PredictionContent() {
                 </div>
 
                 {/* Advanced Mode Toggle */}
-                <div className="border-t border-slate-100 pt-4">
-                  <button type="button" onClick={() => setIsAdvancedMode(!isAdvancedMode)} className="flex items-center gap-2 text-indigo-600 font-medium text-sm hover:text-indigo-700 transition-colors mx-auto">
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsAdvancedMode(!isAdvancedMode)}
+                    className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium text-sm hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors mx-auto">
                     {isAdvancedMode ? (
                       <>
                         <span>{dict.hideAdvanced}</span>
@@ -502,10 +528,11 @@ function PredictionContent() {
                 {/* Advanced Metrics Section */}
                 {isAdvancedMode && (
                   <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                       <TrendingUp className="w-4 h-4" /> {dict.advancedMetrics}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* ... Advanced inputs with similar InputField structure ... */}
                       <InputField
                         label={dict.labels.viewers}
                         name="Viewers"
@@ -603,7 +630,7 @@ function PredictionContent() {
 
                 {/* Error Message */}
                 {error && (
-                  <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl flex items-start gap-3 text-sm animate-pulse">
+                  <div className="p-4 bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800 text-red-600 dark:text-red-400 rounded-xl flex items-start gap-3 text-sm animate-pulse">
                     <AlertCircle className="w-5 h-5 shrink-0" />
                     <span>{error}</span>
                   </div>
@@ -614,7 +641,7 @@ function PredictionContent() {
                   ref={submitButtonRef}
                   type="submit"
                   disabled={loading}
-                  className={`w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200/50 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer ${isDemoMode ? 'pointer-events-none' : ''}`}>
+                  className={`w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200/50 dark:shadow-indigo-900/40 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer ${isDemoMode ? 'pointer-events-none' : ''}`}>
                   {loading ? (
                     <>
                       <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -637,14 +664,14 @@ function PredictionContent() {
                     <button
                       type="button"
                       onClick={() => (window.location.href = '/prediksi')}
-                      className="w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200/50 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer">
+                      className="w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200/50 dark:shadow-indigo-900/40 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer">
                       <span>Prediksi Sekarang</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                     <button
                       type="button"
                       onClick={() => (window.location.href = '/')}
-                      className="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-3 rounded-xl border border-slate-200 shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+                      className="w-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
                       <ArrowLeft className="w-4 h-4" />
                       <span>Kembali</span>
                     </button>
@@ -695,9 +722,12 @@ function InputField({ label, name, type = 'text', value, onChange, icon, placeho
 
   return (
     <div>
-      <label className={`block text-xs font-semibold uppercase tracking-wide mb-2 ml-1 transition-colors ${isActive ? 'text-indigo-600' : 'text-slate-500'}`}>{label}</label>
+      <label className={`block text-xs font-semibold uppercase tracking-wide mb-2 ml-1 transition-colors ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`}>{label}</label>
       <div className="relative group">
-        <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors pointer-events-none ${error ? 'text-red-400' : isActive ? 'text-indigo-600' : 'text-slate-400 group-focus-within:text-indigo-500'}`}>{icon}</div>
+        <div
+          className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors pointer-events-none ${error ? 'text-red-400' : isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400'}`}>
+          {icon}
+        </div>
         <input
           type={type}
           name={name}
@@ -705,22 +735,22 @@ function InputField({ label, name, type = 'text', value, onChange, icon, placeho
           onChange={onChange}
           placeholder={placeholder}
           readOnly={readOnly}
-          className={`peer w-full bg-white/50 border-2 rounded-xl py-3 pl-11 pr-4 text-slate-800 font-medium placeholder-slate-300 focus:outline-none focus:ring-4 transition-all shadow-sm
-            ${readOnly ? 'pointer-events-none bg-slate-50/50 text-slate-600' : ''}
+          className={`peer w-full bg-white/50 dark:bg-slate-800/50 border-2 rounded-xl py-3 pl-11 pr-4 text-slate-800 dark:text-slate-200 font-medium placeholder-slate-300 dark:placeholder-slate-600 focus:outline-none focus:ring-4 transition-all shadow-sm
+            ${readOnly ? 'pointer-events-none bg-slate-50/50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400' : ''}
             ${
               error
-                ? 'border-red-300 focus:border-red-500 focus:ring-red-500/10'
+                ? 'border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10 dark:focus:ring-red-500/20'
                 : isActive
-                  ? 'border-indigo-500 ring-4 ring-indigo-500/10 scale-[1.02] bg-white shadow-lg z-10'
+                  ? 'border-indigo-500 ring-4 ring-indigo-500/10 dark:ring-indigo-500/20 scale-[1.02] bg-white dark:bg-slate-800 shadow-lg z-10'
                   : isOverLimit
-                    ? 'border-amber-400 focus:border-amber-500 focus:ring-amber-500/10'
-                    : 'border-slate-100 hover:border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/10'
+                    ? 'border-amber-400 dark:border-amber-600 focus:border-amber-500 focus:ring-amber-500/10 dark:focus:ring-amber-500/20'
+                    : 'border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 focus:border-indigo-500 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20'
             }`}
         />
       </div>
       {/* Error Message - Highest Priority */}
       {error && (
-        <div className="mt-1 ml-1 flex items-center gap-1.5 text-xs text-red-500 font-medium animate-in fade-in slide-in-from-top-1">
+        <div className="mt-1 ml-1 flex items-center gap-1.5 text-xs text-red-500 dark:text-red-400 font-medium animate-in fade-in slide-in-from-top-1">
           <AlertCircle className="w-3 h-3" />
           <span>{error}</span>
         </div>
@@ -728,7 +758,7 @@ function InputField({ label, name, type = 'text', value, onChange, icon, placeho
 
       {/* Visual Warning - Only show if no error */}
       {!error && isOverLimit && (
-        <div className="mt-1 ml-1 flex items-center gap-1.5 text-xs text-amber-600 font-medium animate-pulse">
+        <div className="mt-1 ml-1 flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-500 font-medium animate-pulse">
           <AlertTriangle className="w-3 h-3" />
           <span>{warningText || `Exceeds limit (${limit?.toLocaleString('id-ID')})`}</span>
         </div>
