@@ -292,17 +292,11 @@ function PredictionContent() {
     setLoading(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const hfToken = process.env.HUGGINGFACE_TOKEN;
-      if (!apiUrl) {
-        throw new Error('API URL is not defined');
-      }
-
-      const response = await fetch(apiUrl + '/predict', {
+      // Panggil endpoint Next.js lokal Anda, bukan langsung ke HuggingFace
+      const response = await fetch('/api/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          "Authorization": `Bearer ${hfToken}`
         },
         body: JSON.stringify({ data: formData }),
       });
@@ -310,7 +304,7 @@ function PredictionContent() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
         console.error('API Error Details:', errorData);
-        throw new Error(errorData?.detail?.[0]?.msg || 'Failed to fetch prediction');
+        throw new Error(errorData?.error?.detail?.[0]?.msg || 'Failed to fetch prediction');
       }
 
       const data: ApiResponse = await response.json();
@@ -326,7 +320,7 @@ function PredictionContent() {
       }, 100);
     } catch (err) {
       console.error(err);
-      setError(dict.errors.fetchFailed);
+      setError(dict.errors.fetchFailed); // Sesuaikan dengan dictionary Anda
     } finally {
       setLoading(false);
     }
