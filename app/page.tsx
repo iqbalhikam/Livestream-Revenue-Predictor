@@ -6,6 +6,7 @@ import { useLanguage } from '@/components/LanguageContext';
 import { dictionaries } from '@/lib/dictionaries';
 
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { UserNav } from '@/components/UserNav';
 
 export default function LandingPage() {
   const { language, toggleLanguage } = useLanguage();
@@ -30,6 +31,7 @@ export default function LandingPage() {
             <Globe className="w-4 h-4" />
             <span>{language === 'id' ? 'ID' : 'EN'}</span>
           </button>
+          <UserNav />
         </div>
       </nav>
 

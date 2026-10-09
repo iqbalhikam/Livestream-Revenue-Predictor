@@ -27,7 +27,9 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageContext';
 import { dictionaries } from '@/lib/dictionaries';
+import Link from 'next/link';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { UserNav } from '@/components/UserNav';
 
 // --- Interfaces ---
 
@@ -340,12 +342,12 @@ function PredictionContent() {
       {/* ... Navbar and Header ... */}
       <nav className="fixed top-0 left-0 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-50 transition-colors">
         <div className="container mx-auto px-6 h-16 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-slate-900 dark:text-white">
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight text-slate-900 dark:text-white hover:opacity-90 transition-opacity">
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
               <Sparkles className="w-5 h-5" />
             </div>
             <span>StreamLytics</span>
-          </div>
+          </Link>
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <button
@@ -354,6 +356,7 @@ function PredictionContent() {
               <Globe className="w-4 h-4" />
               <span>{language === 'id' ? 'ID' : 'EN'}</span>
             </button>
+            <UserNav />
           </div>
         </div>
       </nav>
