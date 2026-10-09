@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 
+// WAJIB bernama POST, bukan handler atau default
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL; // URL HuggingFace Anda
-    const hfToken = process.env.HUGGINGFACE_TOKEN; // Aman, hanya terbaca di server
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const hfToken = process.env.HUGGINGFACE_TOKEN;
 
+    // Lakukan fetch ke HuggingFace di sini...
     const response = await fetch(`${apiUrl}/predict`, {
       method: 'POST',
       headers: {
