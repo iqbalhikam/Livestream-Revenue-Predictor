@@ -301,6 +301,7 @@ function PredictionContent() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          "Authorization": `Bearer ${process.env.HUGGINGFACE_TOKEN}`
         },
         body: JSON.stringify({ data: formData }),
       });
