@@ -293,6 +293,7 @@ function PredictionContent() {
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const hfToken = process.env.HUGGINGFACE_TOKEN;
       if (!apiUrl) {
         throw new Error('API URL is not defined');
       }
@@ -301,7 +302,7 @@ function PredictionContent() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          "Authorization": `Bearer ${process.env.HUGGINGFACE_TOKEN}`
+          "Authorization": `Bearer ${hfToken}`
         },
         body: JSON.stringify({ data: formData }),
       });
